@@ -30,7 +30,7 @@ import "./IContext.sol";
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract ERC20 is Initializable, IContext, IERC20 {
+contract MyERC20 is Initializable, IContext, IERC20 {
     using SafeMath for uint256;
 
     mapping (address => uint256) private _balances;

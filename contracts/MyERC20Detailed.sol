@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.so
 /**
  * @dev Optional functions from the ERC20 standard.
  */
-contract ERC20Detailed is Initializable, IERC20 {
+contract MyERC20Detailed is Initializable, IERC20 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;

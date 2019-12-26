@@ -2,9 +2,9 @@ pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "./RelayerRole.sol";
-import "./ERC20Mintable.sol";
-import "./ERC20Detailed.sol";
-import "./GSNRecipient.sol";
+import "./MyERC20Mintable.sol";
+import "./MyERC20Detailed.sol";
+import "./MyGSNRecipient.sol";
 
 /** 
  * @title 用户转账无需 Gas 的 ERC20 Token
@@ -25,8 +25,8 @@ import "./GSNRecipient.sol";
  */
 
 contract GaslessToken is Initializable, RelayerRole,
-                         ERC20Detailed, ERC20Mintable, 
-                         GSNRecipient {
+                         MyERC20Detailed, MyERC20Mintable, 
+                         MyGSNRecipient {
     
     /**  @dev init: ERC20Detailed.initialize(), GSNRecipient.initialize(), RelayerRole.initialize()
       *  called by app deployer
@@ -40,14 +40,14 @@ contract GaslessToken is Initializable, RelayerRole,
         RelayerRole.initialize(relayer);
 
         // init token detail
-        ERC20Detailed.initialize(name, symbol, decimals);
+        MyERC20Detailed.initialize(name, symbol, decimals);
 
         // Initialize the minter and pauser roles, and renounce them
-        ERC20Mintable.initialize(issuer);
+        MyERC20Mintable.initialize(issuer);
         // _removeMinter(address(this));
 
         // set default relayHub 
-        GSNRecipient.initialize();
+        MyGSNRecipient.initialize();
 
         // Mint the initial supply
         _mint(issuer, initialSupply);
@@ -116,7 +116,7 @@ contract GaslessToken is Initializable, RelayerRole,
      */
     function transfer(address recipient, uint256 amount) 
         public onlyRelayHub() returns (bool) {
-        return ERC20.transfer(recipient, amount);
+        return MyERC20.transfer(recipient, amount);
     }
 
     /**
@@ -128,7 +128,7 @@ contract GaslessToken is Initializable, RelayerRole,
      */
     function approve(address spender, uint256 amount) 
         public onlyRelayHub() returns (bool) {
-        return ERC20.approve(spender, amount);
+        return MyERC20.approve(spender, amount);
     }
 
     /**
@@ -145,7 +145,7 @@ contract GaslessToken is Initializable, RelayerRole,
      */
     function transferFrom(address sender, address recipient, uint256 amount) 
         public onlyRelayHub() returns (bool) {
-        return ERC20.transferFrom(sender, recipient, amount);
+        return MyERC20.transferFrom(sender, recipient, amount);
     }
 
     /**
@@ -162,7 +162,7 @@ contract GaslessToken is Initializable, RelayerRole,
      */
     function increaseAllowance(address spender, uint256 addedValue) 
         public onlyRelayHub() returns (bool) {
-        return ERC20.increaseAllowance(spender, addedValue);
+        return MyERC20.increaseAllowance(spender, addedValue);
     }
 
     /**
@@ -181,7 +181,7 @@ contract GaslessToken is Initializable, RelayerRole,
      */
     function decreaseAllowance(address spender, uint256 subtractedValue) 
         public onlyRelayHub() returns (bool) {
-        return ERC20.decreaseAllowance(spender, subtractedValue);
+        return MyERC20.decreaseAllowance(spender, subtractedValue);
     }
 
 }

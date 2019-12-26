@@ -17,7 +17,7 @@ import "./IContext.sol";
  * information on how to use the pre-built {GSNRecipientSignature} and
  * {GSNRecipientERC20Fee}, or how to write your own.
  */
-contract GSNRecipient is Initializable, IRelayRecipient, IContext {
+contract MyGSNRecipient is Initializable, IRelayRecipient, IContext {
     function initialize() public initializer {
         if (_relayHub == address(0)) {
             setDefaultRelayHub();

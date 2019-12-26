@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
-import "./ERC20.sol";
+import "./MyERC20.sol";
 
 /**
  * @dev Extension of {ERC20} that adds a set of accounts with the {MinterRole},
@@ -9,11 +9,11 @@ import "./ERC20.sol";
  *
  * At construction, the deployer of the contract is the only minter.
  */
-contract ERC20Mintable is Initializable, ERC20 {
+contract MyERC20Mintable is Initializable, MyERC20 {
     address private _minter;
     
     function initialize(address minter) public initializer {
-        ERC20.initialize();
+        MyERC20.initialize();
         _minter = minter;
     }
 
