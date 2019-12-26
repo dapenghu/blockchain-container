@@ -8,16 +8,21 @@ import Footer from './components/Footer/index.js';
 import Hero from './components/Hero/index.js';
 import Web3Info from './components/Web3Info/index.js';
 import Counter from './components/Counter/index.js';
-
 import styles from './App.module.scss';
+import walletJSON from '../config/wallet_cipher.json';
 
 // eslint-disable-next-line no-unused-vars
 const infuraToken = process.env.REACT_APP_INFURA_TOKEN || '95202223388e49f48b423ea50a70e336';
+
+// const Logger = prop => (
+//   console[Object.keys(prop)[0]](...Object.values(prop)),null // ➜ React components must return something
+// )
 
 function App() {
   // get ephemeralKey
   // eslint-disable-next-line no-unused-vars
   const signKey = useEphemeralKey();
+  console.dir(signKey);
 
   // get GSN web3
   // const context = useWeb3Network(`wss://rinkeby.infura.io/ws/v3/${infuraToken}`, {
@@ -33,6 +38,10 @@ function App() {
       signKey,
     },
   });
+
+  var wallet = context.lib.eth.accounts.wallet;
+  wallet.decrypt(walletJSON, 'test');
+  console.log(wallet[0]);
 
   // load Counter json artifact
   let counterJSON = undefined;
