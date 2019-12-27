@@ -101,7 +101,7 @@ contract GaslessToken is Initializable, RelayerRole,
      * @dev Throws if called by any account other than the Relay Hub.
      */
     modifier onlyRelayHub() {
-        require(msg.sender != getHubAddr(), "GaslessToken: caller is not the Relay Hub");
+        require(msg.sender == getHubAddr(), "GaslessToken: caller is not the Relay Hub");
         _;
     }
 
