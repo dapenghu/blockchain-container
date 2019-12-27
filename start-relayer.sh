@@ -1,1 +1,1 @@
-npx oz-gsn run-relayer --quiet --detach
+npx oz-gsn run-relayer --workdir=./data/relayer
