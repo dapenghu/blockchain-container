@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 
 // eslint-disable-next-line no-unused-vars
 import { useWeb3Network, useEphemeralKey, useWeb3Injected } from '@openzeppelin/network/react';
-// https://github.com/OpenZeppelin/openzeppelin-network.js
 
 import Header from './components/Header/index.js';
 import Footer from './components/Footer/index.js';
 import Hero from './components/Hero/index.js';
 import Web3Info from './components/Web3Info/index.js';
 import Counter from './components/Counter/index.js';
-import Token from './components/Token/index.js';
 import styles from './App.module.scss';
 import walletJSON from '../config/wallet_cipher.json';
 
@@ -24,70 +22,43 @@ function App() {
   // get ephemeralKey
   // eslint-disable-next-line no-unused-vars
   const signKey = useEphemeralKey();
+  console.dir(signKey);
 
-  // get GSN web3 against rinkeby network
-  // const gsnContext = useWeb3Network(`wss://rinkeby.infura.io/ws/v3/${infuraToken}`, {
+  // get GSN web3
+  // const context = useWeb3Network(`wss://rinkeby.infura.io/ws/v3/${infuraToken}`, {
   //   pollInterval: 15 * 1000,
   //   gsn: {
   //     signKey,
   //   },
   // });
 
-  // get GSN web3 against ganache-cli network
-  // const { accounts, networkId, networkName, providerName, lib, connected } = web3Context
-  const gsnContext = useWeb3Network('http://127.0.0.1:8545', {
+  const context = useWeb3Network('http://127.0.0.1:8545', {
     gsn: {
       dev: true,
       signKey,
     },
   });
-  var wallet = gsnContext.lib.eth.accounts.wallet;
-  wallet.decrypt(walletJSON, 'test');
 
-  const injectedContext = useWeb3Injected();
-  var injectedWallet = injectedContext.lib.eth.accounts.wallet;
-  injectedWallet.decrypt(walletJSON, 'test');
-  // console.dir(injectedContext,{depth: 0});
+  var wallet = context.lib.eth.accounts.wallet;
+  wallet.decrypt(walletJSON, 'test');
+  console.log(wallet[0]);
 
   // load Counter json artifact
-  const [counterJSON, setCounterJSON] = useState(undefined);
-  if (!counterJSON) {
-    try {
-      // see https://github.com/OpenZeppelin/solidity-loader
-      let json = require('../../contracts/Counter.sol');
-      console.dir(json);
-      setCounterJSON(json);
-    } catch (e) {
-      console.log(e);
-    }
+  let counterJSON = undefined;
+  try {
+    // see https://github.com/OpenZeppelin/solidity-loader
+    counterJSON = require('../../contracts/Counter.sol');
+  } catch (e) {
+    console.log(e);
   }
 
   // load Counter instance
   const [counterInstance, setCounterInstance] = useState(undefined);
-  let networkId = undefined;
-  if (!counterInstance && gsnContext && counterJSON && counterJSON.networks && gsnContext.networkId) {
-    networkId = counterJSON.networks[gsnContext.networkId.toString()];
-    if (networkId) {
-      setCounterInstance(new gsnContext.lib.eth.Contract(counterJSON.abi, networkId.address));
-    }
-  }
-
-  // load Token Contract json artifact
-  const [tokenJson, setTokenJson] = useState(undefined);
-  if (!tokenJson) {
-    try {
-      let json = require('../../contracts/GaslessToken.sol');
-      setTokenJson(json);
-      console.dir(json);
-    } catch (e) {}
-  }
-
-  // load Token instance
-  const [tokenInstance, setTokenInstance] = useState(undefined);
-  if (!tokenInstance && gsnContext && tokenJson && tokenJson.networks && gsnContext.networkId) {
-    networkId = tokenJson.networks[gsnContext.networkId.toString()];
-    if (networkId) {
-      setTokenInstance(new gsnContext.lib.eth.Contract(tokenJson.abi, networkId.address));
+  let deployedNetwork = undefined;
+  if (!counterInstance && context && counterJSON && counterJSON.networks && context.networkId) {
+    deployedNetwork = counterJSON.networks[context.networkId.toString()];
+    if (deployedNetwork) {
+      setCounterInstance(new context.lib.eth.Contract(counterJSON.abi, deployedNetwork.address));
     }
   }
 
@@ -105,13 +76,12 @@ function App() {
       <Header />
       <Hero />
       <div className={styles.wrapper}>
-        {!gsnContext.lib && renderNoWeb3()}
+        {!context.lib && renderNoWeb3()}
         <div className={styles.contracts}>
-          <h1>断直连交易</h1>
+          <h1>BUIDL with GSN Kit!</h1>
           <div className={styles.widgets}>
-            <Web3Info title="Web3 Information" context={injectedContext} />
-            {/**<Counter {...context} JSON={counterJSON} instance={counterInstance} networkId={networkId} />*/}
-            <Token {...gsnContext} JSON={tokenJson} instance={tokenInstance} wallet={walletJSON} />
+            <Web3Info title="Web3 Provider" context={context} />
+            <Counter {...context} JSON={counterJSON} instance={counterInstance} deployedNetwork={deployedNetwork} />
           </div>
         </div>
       </div>

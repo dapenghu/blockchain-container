@@ -1,9 +1,7 @@
 {
   "manifestVersion": "2.2",
   "contracts": {
-    "Counter": "Counter",
-    "TutorialToken": "GaslessToken",
-    "GaslessToken": "GaslessToken"
+    "Counter": "Counter"
   },
   "dependencies": {},
   "name": "starter-kit-gsn",

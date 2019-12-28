@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PublicAddress, Button, MetaMaskButton } from 'rimble-ui';
+import { PublicAddress, Button } from 'rimble-ui';
 import styles from './Web3Info.module.scss';
 
 export default function Web3Info(props) {
@@ -44,16 +44,18 @@ export default function Web3Info(props) {
         <div className={styles.value}>{balance}</div>
       </div>
       <div className={styles.dataPoint}>
-        <div className={styles.label}>Provider: {providerName}</div>
+        <div className={styles.label}>Provider:</div>
+        <div className={styles.value}>{providerName}</div>
       </div>
       {accounts && accounts.length ? (
         <div className={styles.dataPoint}>
-          <MetaMaskButton.Outline disabled>Connect with MetaMask</MetaMaskButton.Outline>
+          <div className={styles.label}>Accounts & Signing Status</div>
+          <div className={styles.value}>Access Granted</div>
         </div>
       ) : !!networkId && providerName !== 'infura' ? (
         <div>
           <br />
-          <MetaMaskButton.Outline onClick={() => requestAuth(context)}>Connect with MetaMask</MetaMaskButton.Outline>
+          <Button onClick={() => requestAuth(context)}>Request Access</Button>
         </div>
       ) : (
         <div></div>
