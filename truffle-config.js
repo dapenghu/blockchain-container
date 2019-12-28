@@ -29,4 +29,17 @@ module.exports = {
     rinkeby: configNetwok('rinkeby', 4),
     main: configNetwok('mainnet', 1),
   },
+  compilers: {
+    solc: {
+      version: "0.5.2",
+      docker: false,
+      settings: {
+       optimizer: {
+         enabled: true,
+         runs: 200
+       },
+       evmVersion: "byzantium"
+      }
+    }
+  }
 };
