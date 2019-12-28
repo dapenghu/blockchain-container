@@ -8,6 +8,7 @@ import { utils } from '@openzeppelin/gsn-provider';
 const { isRelayHubDeployedForRecipient, getRecipientFunds } = utils;
 
 export default function Counter(props) {
+  // const { accounts, networkId, networkName, providerName, lib, connected } = web3Context
   const { instance, accounts, lib, networkName, networkId, providerName } = props;
   const { _address, methods } = instance || {};
 
@@ -170,8 +171,10 @@ export default function Counter(props) {
 
   return (
     <div className={styles.counter}>
-      <h3> Counter Instance </h3>
+      <h3> Counter Contract </h3>
+
       {lib && !instance && renderNoDeploy()}
+
       {lib && instance && (
         <React.Fragment>
           <div className={styles.dataPoint}>

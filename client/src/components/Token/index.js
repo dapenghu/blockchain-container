@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { PublicAddress, Button, Loader } from 'rimble-ui';
 
 import styles from './Token.module.scss';
@@ -9,24 +9,39 @@ const { isRelayHubDeployedForRecipient, getRecipientFunds } = utils;
 
 export default function Token(props) {
   // const { accounts, networkId, networkName, providerName, lib, connected } = web3Context
-  const { instance, accounts, lib, networkName, networkId, providerName } = props;
+  const { instance, accounts, lib, networkName, providerName, wallet } = props;
   const { _address, methods } = instance || {};
+
+  // state: address book of the wallet
+  const addresses = useMemo(() => {
+    return wallet.map(item => item.address);
+    console.log(addresses);
+  }, [wallet]);
 
   // GSN provider has only one key pair
   const isGSN = providerName === 'GSN';
+  const totalSupply = 10000;
 
-  const [balance, setBalance] = useState(0);
+  // state: balance sheet
+  const [balanceSheet, setBalanceSheet] = useState([]);
 
-  const getBalance = useCallback(async () => {
-    let balance =
-      accounts && accounts.length > 0 ? lib.utils.fromWei(await lib.eth.getBalance(accounts[0]), 'ether') : 'Unknown';
-    setBalance(Number(balance));
-  }, [accounts, lib.eth, lib.utils]);
+  const getBalanceSheet = useCallback(async () => {
+    let balanceSheet = [];
+    if (instance) {
+      for (let item of wallet) {
+        const balance = await instance.methods.balanceOf(item.address).call();
+        balanceSheet.push({ address: item.address, balance: balance });
+      }
+    }
+    setBalanceSheet(balanceSheet);
+    console.log(balanceSheet);
+  }, [instance, wallet]);
 
   useEffect(() => {
-    if (!isGSN) getBalance();
-  }, [accounts, getBalance, isGSN, lib.eth, lib.utils, networkId]);
+    getBalanceSheet();
+  }, [getBalanceSheet, lib.eth, lib.utils]);
 
+  // state: recipient fund
   const [, setIsDeployed] = useState(false);
   const [funds, setFunds] = useState(0);
 
@@ -49,62 +64,25 @@ export default function Token(props) {
     getDeploymentAndFunds();
   }, [getDeploymentAndFunds, instance]);
 
+  // state: Contract value
   const [count, setCount] = useState(0);
 
   const getCount = useCallback(async () => {
-    if (instance) {
-      // Get the value from the contract to prove it worked.
-      const response = await instance.methods.getCounter().call();
-      // Update state with the result.
-      setCount(response);
-    }
-  }, [instance]);
+    // if (instance) {
+    //   // Get the value from the contract to prove it worked.
+    //   const response = await instance.methods.getCounter().call();
+    //   // Update state with the result.
+    //   setCount(response);
+    // }
+  }, []);
 
   useEffect(() => {
     getCount();
   }, [getCount, instance]);
 
+  // state: sending transaction information
   const [sending, setSending] = useState(false);
   const [transactionHash, setTransactionHash] = useState('');
-
-  const increase = async number => {
-    try {
-      if (!sending) {
-        setSending(true);
-
-        const tx = await instance.methods.increaseCounter(number).send({ from: accounts[0] });
-        const receipt = await getTransactionReceipt(lib, tx.transactionHash);
-        setTransactionHash(receipt.transactionHash);
-
-        getCount();
-        getDeploymentAndFunds();
-
-        setSending(false);
-      }
-    } catch (e) {
-      setSending(false);
-      console.log(e);
-    }
-  };
-
-  const decrease = async number => {
-    try {
-      if (!sending) {
-        setSending(true);
-
-        const receipt = await instance.methods.decreaseCounter(number).send({ from: accounts[0] });
-        setTransactionHash(receipt.transactionHash);
-
-        getCount();
-        getDeploymentAndFunds();
-
-        setSending(false);
-      }
-    } catch (e) {
-      setSending(false);
-      console.log(e);
-    }
-  };
 
   function renderNoDeploy() {
     return (
@@ -171,32 +149,30 @@ export default function Token(props) {
 
   return (
     <div className={styles.counter}>
-      <h3> Token Contract </h3>
+      <h3> Tutorial Token Contract </h3>
 
       {lib && !instance && renderNoDeploy()}
 
       {lib && instance && (
         <React.Fragment>
           <div className={styles.dataPoint}>
-            <div className={styles.label}>Instance address:</div>
+            <div className={styles.label}>Contract Proxy address:</div>
             <div className={styles.value}>
               <PublicAddress label="" address={_address} />
             </div>
           </div>
           <div className={styles.dataPoint}>
-            <div className={styles.label}>Counter Value:</div>
-            <div className={styles.value}>{count}</div>
+            <div className={styles.label}>Total Supply: {totalSupply} TTT</div>
           </div>
           {isGSN && (
             <div className={styles.dataPoint}>
-              <div className={styles.label}>Recipient Funds:</div>
-              <div className={styles.value}>{lib.utils.fromWei(funds.toString(), 'ether')} ETH</div>
+              <div className={styles.label}>Recipient Funds: {lib.utils.fromWei(funds.toString(), 'ether')} ETH</div>
             </div>
           )}
           {isGSN && !funds && renderNoFunds()}
-          {!isGSN && !balance && renderNoBalance()}
 
-          {(!!funds || !!balance) && (
+          {/** 
+          {(!!funds) && (
             <React.Fragment>
               <div className={styles.label}>
                 <strong>Token Actions</strong>
@@ -211,7 +187,7 @@ export default function Token(props) {
               </div>
             </React.Fragment>
           )}
-          {transactionHash && networkName !== 'Private' && renderTransactionHash()}
+          {transactionHash && networkName !== 'Private' && renderTransactionHash()}*/}
         </React.Fragment>
       )}
     </div>
