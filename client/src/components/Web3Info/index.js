@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PublicAddress, Button, MetaMaskButton } from 'rimble-ui';
+import { PublicAddress, MetaMaskButton } from 'rimble-ui';
 import styles from './Web3Info.module.scss';
 
 export default function Web3Info(props) {
