@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 // eslint-disable-next-line no-unused-vars
 import { useWeb3Network, useEphemeralKey, useWeb3Injected } from '@openzeppelin/network/react';
@@ -6,10 +6,11 @@ import { useWeb3Network, useEphemeralKey, useWeb3Injected } from '@openzeppelin/
 
 import Header from './components/Header/index.js';
 import Footer from './components/Footer/index.js';
-import Hero from './components/Hero/index.js';
-import Web3Info from './components/Web3Info/index.js';
-import Counter from './components/Counter/index.js';
+// import Hero from './components/Hero/index.js';
+// import Web3Info from './components/Web3Info/index.js';
+// import AddressBook from './components/AddressBook/index.js';
 import Token from './components/Token/index.js';
+import Transaction from './components/Transaction';
 import styles from './App.module.scss';
 import walletJSON from '../config/wallet_cipher.json';
 
@@ -36,59 +37,86 @@ function App() {
   // get GSN web3 against ganache-cli network
   // const { accounts, networkId, networkName, providerName, lib, connected } = web3Context
   const gsnContext = useWeb3Network('http://127.0.0.1:8545', {
+    pollInterval: 50000,
     gsn: {
       dev: true,
-      signKey,
+      useGSN: true,
+      verbose: true,
+      preferredRelayer: {
+        RelayServerAddress: '0xB4E22C44eAdcc0e839DF8BA2a70b492564d37F7E',
+        relayUrl: 'http://localhost:8090',
+        transactionFee: '70',
+      },
+      // signKey: "08e9d80abe835aa97e6491e12fb3a508abec83460f9e39672ee6f1f809928e05"
     },
   });
+
+  // console.log(gsnContext.lib.currentProvider);
   var wallet = gsnContext.lib.eth.accounts.wallet;
   wallet.decrypt(walletJSON, 'test');
 
   const injectedContext = useWeb3Injected();
-  var injectedWallet = injectedContext.lib.eth.accounts.wallet;
-  injectedWallet.decrypt(walletJSON, 'test');
-  // console.dir(injectedContext,{depth: 0});
+  // console.log(injectedContext);
+  // var injectedWallet = injectedContext.lib.eth.accounts.wallet;
+  // injectedWallet.decrypt(walletJSON, 'test');
 
-  // load Counter json artifact
-  const [counterJSON, setCounterJSON] = useState(undefined);
-  if (!counterJSON) {
-    try {
-      // see https://github.com/OpenZeppelin/solidity-loader
-      let json = require('../../contracts/Counter.sol');
-      console.dir(json);
-      setCounterJSON(json);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  // load Counter instance
-  const [counterInstance, setCounterInstance] = useState(undefined);
-  let networkId = undefined;
-  if (!counterInstance && gsnContext && counterJSON && counterJSON.networks && gsnContext.networkId) {
-    networkId = counterJSON.networks[gsnContext.networkId.toString()];
-    if (networkId) {
-      setCounterInstance(new gsnContext.lib.eth.Contract(counterJSON.abi, networkId.address));
-    }
-  }
-
-  // load Token Contract json artifact
+  // define token contract state
   const [tokenJson, setTokenJson] = useState(undefined);
-  if (!tokenJson) {
-    try {
-      let json = require('../../contracts/GaslessToken.sol');
-      setTokenJson(json);
-      console.dir(json);
-    } catch (e) {}
-  }
+  const [tokenAddress, setTokenAddress] = useState(undefined);
+  const [tokenInstance, setTokenInstance] = useState(undefined);
 
   // load Token instance
-  const [tokenInstance, setTokenInstance] = useState(undefined);
-  if (!tokenInstance && gsnContext && tokenJson && tokenJson.networks && gsnContext.networkId) {
-    networkId = tokenJson.networks[gsnContext.networkId.toString()];
-    if (networkId) {
-      setTokenInstance(new gsnContext.lib.eth.Contract(tokenJson.abi, networkId.address));
+  if (gsnContext && gsnContext.networkId && !tokenJson) {
+    let json;
+    try {
+      json = require('../../contracts/GaslessToken.sol');
+      console.dir(json);
+    } catch (e) {}
+    var networkId = gsnContext.networkId.toString();
+    var address = json.networks[networkId].address;
+    setTokenJson(json);
+    setTokenAddress(address);
+    setTokenInstance(new gsnContext.lib.eth.Contract(json.abi, address));
+  }
+
+  // state: balance sheet
+  const [addresses, setAddresses] = useState([]);
+  // const [ethBalances, setEthBalances] = useState([]);
+  const [tokenBalances, setTokenBalances] = useState([]);
+
+  const transfer = useCallback(
+    async (sender, recipient, amount) => {
+      var method = tokenInstance.methods.transfer(recipient, amount);
+      console.log(tokenInstance.methods);
+      console.log(method);
+      console.log(typeof method.send + ' : ' + method.send);
+      var res = await method.send({ from: sender, gas: 1000000 });
+
+      console.log(res);
+    },
+    [tokenInstance],
+  );
+
+  const refreshBalance = useCallback(async () => {
+    var addrs = [];
+    // var ethValues = [];
+    var tokenValues = [];
+
+    for (var item of walletJSON) {
+      addrs.push('0x' + item.address);
+      // var wei = await gsnContext.lib.eth.getBalance(item.address);
+      // ethValues.push(
+      //     gsnContext.lib.utils.fromWei(wei, 'ether'));
+      tokenValues.push(await tokenInstance.methods.balanceOf(item.address).call());
     }
+
+    setAddresses(addrs);
+    // setEthBalances(ethValues);
+    setTokenBalances(tokenValues);
+  }, [tokenInstance]);
+
+  if (addresses.length == 0 && tokenInstance) {
+    refreshBalance();
   }
 
   function renderNoWeb3() {
@@ -102,16 +130,24 @@ function App() {
 
   return (
     <div className={styles.App}>
-      <Header />
-      <Hero />
+      <Header context={injectedContext} />
+      {/**<Hero />*/}
       <div className={styles.wrapper}>
         {!gsnContext.lib && renderNoWeb3()}
         <div className={styles.contracts}>
           <h1>断直连交易</h1>
+          {/**<Web3Info title="Web3 Information" context={injectedContext}/>*/}
           <div className={styles.widgets}>
-            <Web3Info title="Web3 Information" context={injectedContext} />
-            {/**<Counter {...context} JSON={counterJSON} instance={counterInstance} networkId={networkId} />*/}
-            <Token {...gsnContext} JSON={tokenJson} instance={tokenInstance} wallet={walletJSON} />
+            {/**<AddressBook addresses={addresses} balances={ethBalances}/>*/}
+            <Token
+              {...gsnContext}
+              JSON={tokenJson}
+              tokenAddress={tokenAddress}
+              instance={tokenInstance}
+              addresses={addresses}
+              balances={tokenBalances}
+            />
+            <Transaction {...gsnContext} token={tokenInstance} transfer={transfer} />
           </div>
         </div>
       </div>
