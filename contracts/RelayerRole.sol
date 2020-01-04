@@ -2,8 +2,9 @@ pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Roles.sol";
+import "./Ownable.sol";
 
-contract RelayerRole is Initializable {
+contract RelayerRole is Initializable, Ownable {
     using Roles for Roles.Role;
 
     event RelayerAdded(address indexed account);
@@ -11,14 +12,16 @@ contract RelayerRole is Initializable {
 
     Roles.Role private _relayers;
 
-    function initialize(address sender) public initializer {
-        if (!isRelayer(sender)) {
-            _addRelayer(sender);
+    function initialize(address relayer) public initializer {
+        Ownable.initialize(msg.sender);
+
+        if (!isRelayer(relayer)) {
+            _addRelayer(relayer);
         }
     }
 
-    modifier onlyRelayer(address relayer) {
-        require(isRelayer(relayer), "RelayerRole: caller does not have the Relayer role");
+    modifier onlyRelayer(address addr) {
+        require(isRelayer(addr), "RelayerRole: caller does not have the Relayer role");
         _;
     }
 
@@ -26,11 +29,11 @@ contract RelayerRole is Initializable {
         return _relayers.has(account);
     }
 
-    function addRelayer(address account) public {
+    function addRelayer(address account) public onlyOwner() {
         _addRelayer(account);
     }
 
-    function renounceRelayer(address relayer) public {
+    function renounceRelayer(address relayer) public  onlyOwner() {
         _removeRelayer(relayer);
     }
 

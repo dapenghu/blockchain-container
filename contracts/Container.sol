@@ -2,27 +2,24 @@ pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/ownership/Ownable.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
 import "./RelayerRole.sol";
 
 /* 
  * @dev 联盟容器，负责管理联盟内的合约、账户、交易中继
  */
-contract Container is Initializable, Ownable, RelayerRole{
+contract Container is Initializable, RelayerRole{
     using ECDSA for bytes32;
 
     /**  @dev init: ERC20Detailed.initialize(), RelayerRole.initialize()
      *  called by app deployer
      */
     function initialize(address relayer) public initializer {
-        Ownable.initialize(msg.sender);
         RelayerRole.initialize(relayer);
     }
 
-    event TransactionMeta(bytes metaHash, bytes metaSignature);
-    event TransferEvent(address token, address sender, address recipient, uint256 amount, bytes32 metaHash);
+    event RelayCall(bytes32 metaHash, bytes metaSignature);
+    event RelayTransfer(address token, address sender, address recipient, uint256 amount, bytes32 metaHash);
     
     function relayTransfer(
         address tokenAddress,
@@ -53,7 +50,7 @@ contract Container is Initializable, Ownable, RelayerRole{
 
         // emit event
         if (success) {
-            emit TransferEvent( tokenAddress, sender, recipient, amount, metaHash);
+            emit RelayTransfer( tokenAddress, sender, recipient, amount, metaHash);
         }
         return success;
     }
@@ -70,7 +67,7 @@ contract Container is Initializable, Ownable, RelayerRole{
         bytes memory encodedFunctionWithFrom = abi.encodePacked(encodedFunctionCall, sender);
         (bool success, ) = token.call(encodedFunctionWithFrom);
         if (success) {
-            emit TransactionMeta(metaHash, metaSignature);
+            emit RelayCall(metaHash, metaSignature);
         }
         return success;
         // TODO: Event of meta data
