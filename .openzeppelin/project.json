@@ -3,7 +3,8 @@
   "contracts": {
     "Counter": "Counter",
     "TutorialToken": "GaslessToken",
-    "GaslessToken": "GaslessToken"
+    "GaslessToken": "GaslessToken",
+    "Relayer1": "Relayer1"
   },
   "dependencies": {},
   "name": "starter-kit-gsn",
