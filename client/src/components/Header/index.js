@@ -9,7 +9,8 @@ export default function Header(props) {
 
   const requestAuth = async web3Context => {
     try {
-      await web3Context.requestAuth();
+      var account = await web3Context.requestAuth();
+      alert('Get Metamask account: ' + account);
     } catch (e) {
       console.error(e);
     }
