@@ -110,7 +110,7 @@ export default function Token(props) {
 
   return (
     <div className={styles.counter}>
-      <h3> Tutorial Token Contract </h3>
+      <h3> DCEP Contract </h3>
       <h5 text-align="center"> {_address} </h5>
       {isGSN && !funds && renderNoFunds()}
 
@@ -125,23 +125,23 @@ export default function Token(props) {
         <tbody>
           <tr>
             <td width={400}>{addresses[0]}</td>
-            <td>{balances[0]} TTT</td>
+            <td>{balances[0]} CNY</td>
           </tr>
           <tr>
             <td width={400}>{addresses[1]}</td>
-            <td>{balances[1]} TTT</td>
+            <td>{balances[1]} CNY</td>
           </tr>
           <tr>
             <td width={400}>{addresses[2]}</td>
-            <td>{balances[2]} TTT</td>
+            <td>{balances[2]} CNY</td>
           </tr>
           <tr>
             <td width={400}>{addresses[3]}</td>
-            <td>{balances[3]} TTT</td>
+            <td>{balances[3]} CNY</td>
           </tr>
           <tr>
             <td width={400}>{addresses[4]}</td>
-            <td>{balances[4]} TTT</td>
+            <td>{balances[4]} CNY</td>
           </tr>
         </tbody>
       </table>

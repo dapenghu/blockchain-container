@@ -84,8 +84,8 @@ Ganache Configuration
   All contracts are up to date
   ? Do you want to call a function on the instance after creating it? Yes
   ? Select which function * initialize(name: string, symbol: string, decimals: uint8, initialSupply: uint256, issuer: address, relayer: address)
-  ? name (string): TutorialToken
-  ? symbol (string): TTT
+  ? name (string): DCEP
+  ? symbol (string): DCEP
   ? decimals (uint8): 2
   ? initialSupply (uint256): 1000000
   ? issuer (address): 0xFaA53Ab529168732948508e03c0ab1fDDd3B91B2
@@ -96,7 +96,7 @@ Ganache Configuration
 | Name | Value |
 | --- | --- |
 | Name         | TutorialToken |
-| Symbol       | TTT |
+| Symbol       | DCEP |
 | Supply       | 10000 |
 | Token Proxy  | 0x0944C74BceF3F237Aa1E0a587644C5D8659dA569 |
 | Token Impl   | 0xE3dDa49f85CC4ceF0d573492FE2cd51c7D3BaDf0 |

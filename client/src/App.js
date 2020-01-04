@@ -154,7 +154,7 @@ function App() {
           console.log('Metamask signature:' + result.result);
 
           // send relay transaction
-          var abi = web3Context.lib.eth.abi;
+          var abi = metaMaskContext.lib.eth.abi;
           var encodedFunctionCall = abi.encodeFunctionCall(
             {
               name: 'transfer',
@@ -192,13 +192,7 @@ function App() {
         },
       );
     },
-    [
-      metaMaskContext.lib.currentProvider,
-      web3Context.lib.eth.abi,
-      relayerInstance.methods,
-      tokenAddress,
-      refreshBalance,
-    ],
+    [metaMaskContext, relayerInstance, tokenAddress, refreshBalance],
   );
 
   function renderNoWeb3() {
