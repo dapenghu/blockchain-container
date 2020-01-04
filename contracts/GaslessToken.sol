@@ -4,7 +4,6 @@ import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "./RelayerRole.sol";
 import "./MyERC20Mintable.sol";
 import "./MyERC20Detailed.sol";
-import "./MyGSNRecipient.sol";
 
 /** 
  * @title 用户转账无需 Gas 的 ERC20 Token
@@ -25,10 +24,9 @@ import "./MyGSNRecipient.sol";
  */
 
 contract GaslessToken is Initializable, RelayerRole,
-                         MyERC20Detailed, MyERC20Mintable, 
-                         MyGSNRecipient {
+                         MyERC20Detailed, MyERC20Mintable {
     
-    /**  @dev init: ERC20Detailed.initialize(), GSNRecipient.initialize(), RelayerRole.initialize()
+    /**  @dev init: ERC20Detailed.initialize(), RelayerRole.initialize()
       *  called by app deployer
       */
     function initialize(
@@ -46,63 +44,15 @@ contract GaslessToken is Initializable, RelayerRole,
         MyERC20Mintable.initialize(issuer);
         // _removeMinter(address(this));
 
-        // set default relayHub 
-        MyGSNRecipient.initialize();
-
         // Mint the initial supply
         _mint(issuer, initialSupply);
 
-    }
-
-    // GSNRecipient
-    // accept all requests
-    /**
-     * @dev Called by {IRelayHub} to validate if this recipient accepts being charged for a relayed call. Note that the
-     * recipient will be charged regardless of the execution result of the relayed call (i.e. if it reverts or not).
-     *
-     * The relay request was originated by `from` and will be served by `relay`. `encodedFunction` is the relayed call
-     * calldata, so its first four bytes are the function selector. The relayed call will be forwarded `gasLimit` gas,
-     * and the transaction executed with a gas price of at least `gasPrice`. `relay`'s fee is `transactionFee`, and the
-     * recipient will be charged at most `maxPossibleCharge` (in wei). `nonce` is the sender's (`from`) nonce for
-     * replay attack protection in {IRelayHub}, and `approvalData` is a optional parameter that can be used to hold a signature
-     * over all or some of the previous values.
-     *
-     * Returns a tuple, where the first value is used to indicate approval (0) or rejection (custom non-zero error code,
-     * values 1 to 10 are reserved) and the second one is data to be passed to the other {IRelayRecipient} functions.
-     *
-     * {acceptRelayedCall} is called with 50k gas: if it runs out during execution, the request will be considered
-     * rejected. A regular revert will also trigger a rejection.
-     */
-    function acceptRelayedCall(
-        address relay,
-        address,        // from,
-        bytes calldata, // encodedFunction,
-        uint256,        // transactionFee,
-        uint256,        // gasPrice,
-        uint256,        // gasLimit,
-        uint256,        // nonce,
-        bytes calldata, // approvalData,
-        uint256         // maxPossibleCharge
-    ) external view onlyRelayer(relay) returns (uint256, bytes memory) {
-        return _approveRelayedCall();
     }
 
     function _preRelayedCall(bytes memory context) internal returns (bytes32) {
     }
 
     function _postRelayedCall(bytes memory context, bool, uint256 actualCharge, bytes32) internal {
-    }
-
-    function getRecipientBalance() public view returns (uint) {
-        return IRelayHub(getHubAddr()).balanceOf(address(this));
-    }
-
-    /**
-     * @dev Throws if called by any account other than the Relay Hub.
-     */
-    modifier onlyRelayHub() {
-        require(msg.sender == getHubAddr(), "GaslessToken: caller is not the Relay Hub");
-        _;
     }
 
     // override ERC20 methods
@@ -115,7 +65,7 @@ contract GaslessToken is Initializable, RelayerRole,
      * - the caller must have a balance of at least `amount`.
      */
     function transfer(address recipient, uint256 amount) 
-        public onlyRelayHub() returns (bool) {
+        public returns (bool) {
         return MyERC20.transfer(recipient, amount);
     }
 
@@ -127,7 +77,7 @@ contract GaslessToken is Initializable, RelayerRole,
      * - `spender` cannot be the zero address.
      */
     function approve(address spender, uint256 amount) 
-        public onlyRelayHub() returns (bool) {
+        public returns (bool) {
         return MyERC20.approve(spender, amount);
     }
 
@@ -144,7 +94,7 @@ contract GaslessToken is Initializable, RelayerRole,
      * `amount`.
      */
     function transferFrom(address sender, address recipient, uint256 amount) 
-        public onlyRelayHub() returns (bool) {
+        public returns (bool) {
         return MyERC20.transferFrom(sender, recipient, amount);
     }
 
@@ -161,7 +111,7 @@ contract GaslessToken is Initializable, RelayerRole,
      * - `spender` cannot be the zero address.
      */
     function increaseAllowance(address spender, uint256 addedValue) 
-        public onlyRelayHub() returns (bool) {
+        public returns (bool) {
         return MyERC20.increaseAllowance(spender, addedValue);
     }
 
@@ -180,8 +130,72 @@ contract GaslessToken is Initializable, RelayerRole,
      * `subtractedValue`.
      */
     function decreaseAllowance(address spender, uint256 subtractedValue) 
-        public onlyRelayHub() returns (bool) {
+        public returns (bool) {
         return MyERC20.decreaseAllowance(spender, subtractedValue);
+    }
+
+    /**
+     * @dev Replacement for msg.sender. Returns the actual sender of a transaction: msg.sender for regular transactions,
+     * and the end-user for GSN relayed calls (where msg.sender is actually `RelayHub`).
+     *
+     * IMPORTANT: Contracts derived from {GSNRecipient} should never use `msg.sender`, and use {_msgSender} instead.
+     */
+    function _msgSender() internal view returns (address payable) {
+        if (isRelayer(msg.sender)) {
+            return _getRelayedCallSender();
+        } else {
+            return msg.sender;
+        }
+    }
+
+    /**
+     * @dev Replacement for msg.data. Returns the actual calldata of a transaction: msg.data for regular transactions,
+     * and a reduced version for GSN relayed calls (where msg.data contains additional information).
+     *
+     * IMPORTANT: Contracts derived from {GSNRecipient} should never use `msg.data`, and use {_msgData} instead.
+     */
+    function _msgData() internal view returns (bytes memory) {
+        if (isRelayer(msg.sender)) {
+            return _getRelayedCallData();
+        } else {
+            return msg.data;
+        }
+    }
+
+    function _getRelayedCallSender() private pure returns (address payable result) {
+        // We need to read 20 bytes (an address) located at array index msg.data.length - 20. In memory, the array
+        // is prefixed with a 32-byte length value, so we first add 32 to get the memory read index. However, doing
+        // so would leave the address in the upper 20 bytes of the 32-byte word, which is inconvenient and would
+        // require bit shifting. We therefore subtract 12 from the read index so the address lands on the lower 20
+        // bytes. This can always be done due to the 32-byte prefix.
+
+        // The final memory read index is msg.data.length - 20 + 32 - 12 = msg.data.length. Using inline assembly is the
+        // easiest/most-efficient way to perform this operation.
+
+        // These fields are not accessible from assembly
+        bytes memory array = msg.data;
+        uint256 index = msg.data.length;
+
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            // Load the 32 bytes word from memory with the address on the lower 20 bytes, and mask those.
+            result := and(mload(add(array, index)), 0xffffffffffffffffffffffffffffffffffffffff)
+        }
+        return result;
+    }
+
+    function _getRelayedCallData() private pure returns (bytes memory) {
+        // RelayHub appends the sender address at the end of the calldata, so in order to retrieve the actual msg.data,
+        // we must strip the last 20 bytes (length of an address type) from it.
+
+        uint256 actualDataLength = msg.data.length - 20;
+        bytes memory actualData = new bytes(actualDataLength);
+
+        for (uint256 i = 0; i < actualDataLength; ++i) {
+            actualData[i] = msg.data[i];
+        }
+
+        return actualData;
     }
 
 }
