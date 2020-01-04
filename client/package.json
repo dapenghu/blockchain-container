@@ -7,6 +7,8 @@
     "@openzeppelin/network": "^0.2.9",
     "@openzeppelin/solidity-loader": "^1.4.6",
     "classnames": "^2.2.6",
+    "eth-sig-util": "^2.5.2",
+    "ethereumjs-util": "^6.2.0",
     "json-loader": "^0.5.7",
     "node-sass": "^4.12.0",
     "prop-types": "^15.7.2",
