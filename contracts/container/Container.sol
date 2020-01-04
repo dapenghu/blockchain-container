@@ -3,7 +3,7 @@ pragma solidity ^0.5.0;
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-solidity/contracts/cryptography/ECDSA.sol";
-import "./RelayerRole.sol";
+import "../access/RelayerRole.sol";
 
 /* 
  * @dev 联盟容器，负责管理联盟内的合约、账户、交易中继

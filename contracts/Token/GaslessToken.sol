@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
+import "../container/ContainerManaged.sol";
 import "./MyERC20Mintable.sol";
 import "./MyERC20Detailed.sol";
-import "./ContainerManaged.sol";
 
 /** 
  * @title 用户转账无需 Gas 的 ERC20 Token
