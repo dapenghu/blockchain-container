@@ -25,9 +25,9 @@ module.exports = {
       network_id: "5777",
     },
     ropsten: configNetwok('ropsten', 3),
-    kovan: configNetwok('kovan', 42),
+    kovan:   configNetwok('kovan',  42),
     rinkeby: configNetwok('rinkeby', 4),
-    main: configNetwok('mainnet', 1),
+    main:    configNetwok('mainnet', 1),
   },
   compilers: {
     solc: {
