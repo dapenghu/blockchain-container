@@ -12,7 +12,7 @@ import "./IContext.sol";
  * `onlyOwner`, which can be aplied to your functions to restrict their use to
  * the owner.
  */
-contract ContainerManaged is Initializable, IContext {
+contract ContainerContext is Initializable, IContext {
     address private _container;
 
     event SetContainer(address container);
@@ -36,7 +36,7 @@ contract ContainerManaged is Initializable, IContext {
      * @dev Throws if called by any account other than the owner.
      */
     modifier onlyContainer() {
-        require(msg.sender == _container, "ContainerManaged: caller is not the container");
+        require(msg.sender == _container, "ContainerContext: caller is not the container");
         _;
     }
 

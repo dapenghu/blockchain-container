@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.so
 /**
  * @dev Optional functions from the ERC20 standard.
  */
-contract MyERC20Detailed is Initializable, IERC20 {
+contract MyERC20Detailed is Initializable, IERC20{
     string private _name;
     string private _symbol;
     uint8 private _decimals;
@@ -16,7 +16,8 @@ contract MyERC20Detailed is Initializable, IERC20 {
      * these values are immutable: they can only be set once during
      * construction.
      */
-    function initialize(string memory name, string memory symbol, uint8 decimals) public initializer {
+    function initialize(string memory name, string memory symbol, uint8 decimals) 
+    public initializer {
         _name = name;
         _symbol = symbol;
         _decimals = decimals;
@@ -53,5 +54,5 @@ contract MyERC20Detailed is Initializable, IERC20 {
         return _decimals;
     }
 
-    uint256[50] private ______gap;
+    uint256[10] private ______gap;
 }

@@ -46,14 +46,16 @@ contract MyERC20 is Initializable, IContext, IERC20 {
     /**
      * @dev See {IERC20-totalSupply}.
      */
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() 
+    public view returns (uint256) {
         return _totalSupply;
     }
 
     /**
      * @dev See {IERC20-balanceOf}.
      */
-    function balanceOf(address account) public view returns (uint256) {
+    function balanceOf(address account) 
+    public view returns (uint256) {
         return _balances[account];
     }
 
@@ -65,7 +67,8 @@ contract MyERC20 is Initializable, IContext, IERC20 {
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(address recipient, uint256 amount) public returns (bool) {
+    function transfer(address recipient, uint256 amount) 
+    public onlyContainer() returns (bool) {
         _transfer(_msgSender(), recipient, amount);
         return true;
     }
@@ -73,7 +76,8 @@ contract MyERC20 is Initializable, IContext, IERC20 {
     /**
      * @dev See {IERC20-allowance}.
      */
-    function allowance(address owner, address spender) public view returns (uint256) {
+    function allowance(address owner, address spender) 
+    public view returns (uint256) {
         return _allowances[owner][spender];
     }
 
@@ -84,7 +88,8 @@ contract MyERC20 is Initializable, IContext, IERC20 {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(address spender, uint256 amount) public returns (bool) {
+    function approve(address spender, uint256 amount) 
+    public onlyContainer() returns (bool) {
         _approve(_msgSender(), spender, amount);
         return true;
     }
@@ -101,7 +106,8 @@ contract MyERC20 is Initializable, IContext, IERC20 {
      * - the caller must have allowance for `sender`'s tokens of at least
      * `amount`.
      */
-    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
+    function transferFrom(address sender, address recipient, uint256 amount) 
+    public onlyContainer() returns (bool) {
         _transfer(sender, recipient, amount);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: transfer amount exceeds allowance"));
         return true;
@@ -119,7 +125,8 @@ contract MyERC20 is Initializable, IContext, IERC20 {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+    function increaseAllowance(address spender, uint256 addedValue) 
+    public onlyContainer() returns (bool) {
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
         return true;
     }
@@ -138,7 +145,8 @@ contract MyERC20 is Initializable, IContext, IERC20 {
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
      */
-    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+    function decreaseAllowance(address spender, uint256 subtractedValue) 
+    public onlyContainer() returns (bool) {
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: decreased allowance below zero"));
         return true;
     }
@@ -183,7 +191,7 @@ contract MyERC20 is Initializable, IContext, IERC20 {
         emit Transfer(address(0), account, amount);
     }
 
-     /**
+    /**
      * @dev Destroys `amount` tokens from `account`, reducing the
      * total supply.
      *
@@ -234,5 +242,5 @@ contract MyERC20 is Initializable, IContext, IERC20 {
         _approve(account, _msgSender(), _allowances[account][_msgSender()].sub(amount, "ERC20: burn amount exceeds allowance"));
     }
 
-    uint256[50] private ______gap;
+    uint256[10] private ______gap;
 }

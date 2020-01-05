@@ -17,6 +17,17 @@ contract IContext {
     // an instance of this contract, which should be used via inheritance.
     // solhint-disable-previous-line no-empty-blocks
 
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyContainer() {
+        require(isContainer(msg.sender), "ContainerContext: caller is not the container");
+        _;
+    }
+
+    function isContainer(address addr) public view returns (bool);
+    function container() public view returns (address);
+
     function _msgSender() internal view returns (address payable);
     function _msgData() internal view returns (bytes memory);
 }

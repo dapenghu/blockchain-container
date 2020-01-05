@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Roles.sol";
-import "./Ownable.sol";
+import "../access/Ownable.sol";
 
 contract RelayerRole is Initializable, Ownable {
     using Roles for Roles.Role;

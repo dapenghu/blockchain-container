@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
-import "../container/ContainerManaged.sol";
+import "../container/ContainerContext.sol";
 import "./MyERC20Mintable.sol";
 import "./MyERC20Detailed.sol";
 
@@ -23,7 +23,7 @@ import "./MyERC20Detailed.sol";
  * 7. postRelayedCall(): do nothing
  */
 
-contract GaslessToken is Initializable, ContainerManaged,
+contract GaslessToken is Initializable, ContainerContext,
                          MyERC20Detailed, MyERC20Mintable {
     
     /**  @dev init: ERC20Detailed.initialize(), RelayerRole.initialize()
@@ -35,7 +35,7 @@ contract GaslessToken is Initializable, ContainerManaged,
         ) public initializer {
 
         // set relayer role
-        ContainerManaged.initialize(container);
+        ContainerContext.initialize(container);
 
         // init token detail
         MyERC20Detailed.initialize(name, symbol, decimals);
