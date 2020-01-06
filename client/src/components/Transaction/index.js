@@ -1,28 +1,16 @@
 import React, { useState, useEffect } from 'react';
-// import { PublicAddress, Loader, util } from 'rimble-ui';
-import { Box, Form, Input, Field, Button, Flex } from 'rimble-ui';
+import { Box, Form, Input, Field, Button, Flex, Loader } from 'rimble-ui';
 
 import styles from './Transaction.module.scss';
 
-// import getTransactionReceipt from '../../utils/getTransactionReceipt';
-// import { utils } from '@openzeppelin/gsn-provider';
-// const { isRelayHubDeployedForRecipient, getRecipientFunds } = utils;
-
 export default function Transaction(props) {
-  const { lib, transfer } = props;
-  // const { instance, accounts, lib, networkName, providerName, addresses, balances } = props;
-  // const { _address, methods } = instance || {};
+  const { accounts, networkName, lib, transfer, sending, txHash } = props;
 
   const [formValidated, setFormValidated] = useState(false);
   const [validated, setValidated] = useState(false);
-  const [sender, setSender] = useState('');
+  // const [sender, setSender] = useState('');
   const [recipient, setRecipient] = useState('');
-  const [amount, setAmount] = useState(10);
-
-  const handleSender = e => {
-    setSender(e.target.value);
-    validateInput(e);
-  };
+  const [amount, setAmount] = useState(1);
 
   const handleRecipeint = e => {
     setRecipient(e.target.value);
@@ -40,7 +28,7 @@ export default function Transaction(props) {
 
   const validateForm = () => {
     // Perform advanced validation here
-    if (lib.utils.isAddress(sender) && lib.utils.isAddress(recipient) && amount > 0) {
+    if (lib.utils.isAddress(recipient) && amount > 0) {
       setValidated(true);
     } else {
       setValidated(false);
@@ -53,34 +41,54 @@ export default function Transaction(props) {
 
   const handleSubmit = e => {
     e.preventDefault();
-    transfer(sender, recipient, amount);
-    console.log('transfer from ' + sender + ' to ' + recipient + ' : ' + amount);
+    if (!sending) {
+      console.log(accounts[0]);
+      if (!accounts || accounts.length == 0) {
+        alert('Please connect Metamask before submit any transaction');
+        return;
+      }
+      transfer(recipient, amount * 100);
+    }
   };
-  // function renderTransactionHash() {
-  //   return (
-  //     <div>
-  //       <p>
-  //         Transaction{' '}
-  //         <a
-  //           target="_blank"
-  //           rel="noopener noreferrer"
-  //           href={`https://${networkName}.etherscan.io/tx/${transactionHash}`}
-  //         >
-  //           <small>{transactionHash.substr(0, 6)}</small>
-  //         </a>{' '}
-  //         has been mined on {networkName} network.
-  //       </p>
-  //     </div>
-  //   );
-  // }
 
+  function renderPendingTransactionHash() {
+    var txUrl = 'https://' + networkName + '.etherscan.io/tx/' + txHash;
+    console.log(txUrl);
+
+    return (
+      <div>
+        <p>
+          <Loader /> Pending Transaction{' '}
+          <a target="_blank" rel="noopener noreferrer" href={txUrl}>
+            <small>{txHash.substr(0, 20)}</small>
+          </a>
+        </p>
+      </div>
+    );
+  }
+
+  function renderMinedTransactionHash() {
+    var txUrl = 'https://' + networkName + '.etherscan.io/tx/' + txHash;
+    console.log(txUrl);
+
+    return (
+      <div>
+        <p>
+          <a target="_blank" rel="noopener noreferrer" href={txUrl}>
+            <small>{txHash.substr(0, 20)}</small>
+          </a>{' '}
+          has been mined on {networkName} network.
+        </p>
+      </div>
+    );
+  }
   return (
     <div className={styles.counter}>
       <h3> 合规交易 </h3>
       <Box p={4}>
         <Box>
           <Form onSubmit={handleSubmit} validated={formValidated}>
-            <Flex mx={-3} flexWrap={'wrap'}>
+            {/* <Flex mx={-3} flexWrap={'wrap'}>
               <Box width={[1, 1, 1]} px={3}>
                 <Field label="Sender Address" validated={validated} width={400}>
                   <Input
@@ -92,7 +100,7 @@ export default function Transaction(props) {
                   />
                 </Field>
               </Box>
-            </Flex>
+            </Flex> */}
             <Flex mx={-3} flexWrap={'wrap'}>
               <Box width={[1, 1, 1]} px={3}>
                 <Field label="Recipient Address" validated={validated} width={400}>
@@ -125,12 +133,11 @@ export default function Transaction(props) {
                 Submit Form
               </Button>
             </Box>
+            {sending && txHash && renderPendingTransactionHash()}
+            {!sending && txHash && renderMinedTransactionHash()}
           </Form>
         </Box>
       </Box>
-
-      {/** 
-          {transactionHash && networkName !== 'Private' && renderTransactionHash()}*/}
     </div>
   );
 }
