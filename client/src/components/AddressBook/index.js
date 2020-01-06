@@ -29,14 +29,6 @@ export default function AddressBook(props) {
             <td width={400}>{addresses[2]}</td>
             <td>{balances[2]} ETH </td>
           </tr>
-          <tr>
-            <td width={400}>{addresses[3]}</td>
-            <td>{balances[3]} ETH </td>
-          </tr>
-          <tr>
-            <td width={400}>{addresses[4]}</td>
-            <td>{balances[4]} ETH </td>
-          </tr>
         </tbody>
       </table>
     </div>
