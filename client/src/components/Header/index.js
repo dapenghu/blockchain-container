@@ -1,16 +1,15 @@
 import React from 'react';
-import { MetaMaskButton } from 'rimble-ui';
+import { PublicAddress, MetaMaskButton } from 'rimble-ui';
 import styles from './header.module.scss';
 import logo from './stater-kits-logo.png';
 
 export default function Header(props) {
   const { context } = props;
-  const { networkId, accounts, providerName } = context;
+  const { networkName, accounts } = context;
 
   const requestAuth = async web3Context => {
     try {
-      var account = await web3Context.requestAuth();
-      alert('Get Metamask account: ' + account);
+      await web3Context.requestAuth();
     } catch (e) {
       console.error(e);
     }
@@ -26,16 +25,19 @@ export default function Header(props) {
         </div>
 
         {accounts && accounts.length ? (
-          <div className={styles.dataPoint}>
-            <MetaMaskButton.Outline disabled>MetaMask</MetaMaskButton.Outline>
-          </div>
-        ) : !!networkId && providerName !== 'infura' ? (
+          <>
+            <div className={styles.brand}>
+              <PublicAddress address={accounts[0]} />
+            </div>
+            <div className={styles.brand}>
+              <MetaMaskButton.Outline>{networkName}</MetaMaskButton.Outline>
+            </div>
+          </>
+        ) : (
           <div>
             <br />
             <MetaMaskButton.Outline onClick={() => requestAuth(context)}>MetaMask</MetaMaskButton.Outline>
           </div>
-        ) : (
-          <div></div>
         )}
       </nav>
     </div>
