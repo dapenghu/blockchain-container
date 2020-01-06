@@ -1,9 +1,8 @@
 {
   "manifestVersion": "2.2",
   "contracts": {
-    "Counter": "Counter",
-    "TutorialToken": "GaslessToken",
-    "GaslessToken": "GaslessToken",
+    "Container": "Container",
+    "ContainerManagedERC20": "ContainerManagedERC20",
     "Relayer1": "Relayer1"
   },
   "dependencies": {},
