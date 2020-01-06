@@ -1,5 +1,5 @@
 import React from 'react';
-import { PublicAddress, MetaMaskButton } from 'rimble-ui';
+import { PublicAddress, MetaMaskButton, Button } from 'rimble-ui';
 import styles from './header.module.scss';
 import logo from './stater-kits-logo.png';
 
@@ -27,7 +27,7 @@ export default function Header(props) {
         {accounts && accounts.length ? (
           <>
             <div className={styles.brand}>
-              <PublicAddress address={accounts[0]} />
+              <PublicAddress address={accounts[0].substr(0, 20) + '...'}></PublicAddress>
             </div>
             <div className={styles.brand}>
               <MetaMaskButton.Outline>{networkName}</MetaMaskButton.Outline>
