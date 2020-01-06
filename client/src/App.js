@@ -202,7 +202,7 @@ function App() {
         },
       );
     },
-    [metaMaskContext, web3.utils, web3.currentProvider, containerInstance.methods, tokenAddress, refreshBalance],
+    [metaMaskContext, web3.utils, web3.currentProvider, containerInstance, tokenAddress, refreshBalance],
   );
 
   function renderNoWeb3() {
