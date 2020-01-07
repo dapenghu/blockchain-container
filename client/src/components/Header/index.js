@@ -4,8 +4,7 @@ import styles from './header.module.scss';
 import logo from './stater-kits-logo.png';
 
 export default function Header(props) {
-  const { context } = props;
-  const { networkName, accounts } = context;
+  const { context, networkName, account } = props;
 
   const requestAuth = async web3Context => {
     try {
@@ -24,10 +23,10 @@ export default function Header(props) {
           </a>
         </div>
 
-        {accounts && accounts.length ? (
+        {!!account ? (
           <>
             <div className={styles.brand}>
-              <PublicAddress address={accounts[0].substr(0, 20) + '...'}></PublicAddress>
+              <PublicAddress address={account.substr(0, 30) + '...'}></PublicAddress>
             </div>
             <div className={styles.brand}>
               <MetaMaskButton.Outline>{networkName}</MetaMaskButton.Outline>

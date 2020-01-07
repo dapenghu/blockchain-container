@@ -3,7 +3,8 @@ import { typedSignatureHash, concatSig, signTypedDataLegacy } from 'eth-sig-util
 import { toBuffer, ecsign, bufferToHex } from 'ethereumjs-util';
 
 // eslint-disable-next-line no-unused-vars
-import { useWeb3Network, useEphemeralKey, useWeb3Injected } from '@openzeppelin/network/react';
+import { Web3Context } from '@openzeppelin/network';
+import { useWeb3Injected } from '@openzeppelin/network/react';
 // https://github.com/OpenZeppelin/openzeppelin-network.js
 
 import Header from './components/Header/index.js';
@@ -13,6 +14,7 @@ import Footer from './components/Footer/index.js';
 // import AddressBook from './components/AddressBook/index.js';
 import Token from './components/Token/index.js';
 import Transaction from './components/Transaction';
+import getNetworkName from './utils/getNetworkName';
 import styles from './App.module.scss';
 import walletJSON from '../config/wallet_cipher.json';
 
@@ -28,7 +30,32 @@ const ADDRESSES = [
 function App() {
   // load metamask web3 context
   const metaMaskContext = useWeb3Injected();
-  const { accounts, networkId, networkName, lib: web3, connected } = metaMaskContext;
+  const { networkId, lib: web3, connected } = metaMaskContext;
+
+  const [metamaskAccount, setMetamaskAccount] = useState(undefined);
+  const [networkName, setNetworkName] = useState(undefined);
+
+  const onAccountsChanged = useCallback(accounts => {
+    console.log('account changed to: ' + accounts);
+    setMetamaskAccount(accounts[0]);
+  });
+  const onNetworkIdChanged = useCallback((networkId, networkName) => {
+    // console.log("Network Changed to: " + networkId + " [" + getNetworkName(networkId + "]"));
+    console.log('Network Changed to: ' + networkId + ' : ' + networkName);
+    setNetworkName(networkName);
+  });
+
+  // register event listener
+  useEffect(() => {
+    if (metaMaskContext) {
+      metaMaskContext.on(Web3Context.AccountsChangedEventName, onAccountsChanged);
+      metaMaskContext.on(Web3Context.NetworkIdChangedEventName, onNetworkIdChanged);
+    }
+    return function cleanup() {
+      metaMaskContext.off(Web3Context.AccountsChangedEventName, onAccountsChanged);
+      metaMaskContext.off(Web3Context.NetworkIdChangedEventName, onNetworkIdChanged);
+    };
+  }, [metaMaskContext, onAccountsChanged, onNetworkIdChanged]);
 
   // console.log(metaMaskContext);
   var injectedWallet = web3.eth.accounts.wallet;
@@ -216,7 +243,7 @@ function App() {
 
   return (
     <div className={styles.App}>
-      <Header context={metaMaskContext} />
+      <Header context={metaMaskContext} networkName={networkName} account={metamaskAccount} />
       {/**<Hero />*/}
       <div className={styles.wrapper}>
         {!metaMaskContext.lib && renderNoWeb3()}
