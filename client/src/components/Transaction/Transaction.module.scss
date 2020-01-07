@@ -22,15 +22,20 @@
   flex-flow: column wrap;
   justify-content: flex-start;
   // align-items: flex-start;
-  width: 1/2;
+  width: 600px;
   height: auto;
   padding: 40px 20px;
-  border: 1px solid #ccc;
-  box-shadow: 0px 2px 2px #ccc;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  // box-shadow: 0px 2px 2px #ccc;
+  text-align: center;
 
-  h3 {
+  .h3 {
     border-bottom: 1px dotted #ffbe44;
     padding-bottom: 5px;
+    align-items: center;
   }
 
   .dataPoint {
@@ -60,7 +65,7 @@
     }
   }
 
-  .table {
+  table {
     width: 100%;
     border: none;
     letter-spacing: 1px;

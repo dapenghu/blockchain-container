@@ -24,19 +24,41 @@ export default function Header(props) {
         </div>
 
         {!!account ? (
-          <>
-            <div className={styles.brand}>
-              <PublicAddress address={account.substr(0, 30) + '...'}></PublicAddress>
-            </div>
-            <div className={styles.brand}>
-              <MetaMaskButton.Outline>{networkName}</MetaMaskButton.Outline>
-            </div>
-          </>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>
+                  <MetaMaskButton.Outline width="300px">Connected with {networkName}</MetaMaskButton.Outline>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <PublicAddress address={account.substr(0, 40) + '...'} width="300px" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
         ) : (
-          <div>
-            <br />
-            <MetaMaskButton.Outline onClick={() => requestAuth(context)}>MetaMask</MetaMaskButton.Outline>
-          </div>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>
+                  <MetaMaskButton.Outline width="300px" onClick={() => requestAuth(context)}>
+                    Disconnected with Network
+                  </MetaMaskButton.Outline>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <PublicAddress address="0x0000000000000000..." width="300px" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
         )}
       </nav>
     </div>

@@ -13,8 +13,8 @@ import Footer from './components/Footer/index.js';
 // import Web3Info from './components/Web3Info/index.js';
 // import AddressBook from './components/AddressBook/index.js';
 import Token from './components/Token/index.js';
-import Transaction from './components/Transaction';
-import getNetworkName from './utils/getNetworkName';
+import Container from './components/Container/index.js';
+import Transaction from './components/Transaction/index.js';
 import styles from './App.module.scss';
 import walletJSON from '../config/wallet_cipher.json';
 
@@ -252,6 +252,11 @@ function App() {
           {/**<Web3Info title="Web3 Information" context={metaMaskContext}/>*/}
           <div className={styles.widgets}>
             {/**<AddressBook addresses={addresses} balances={ethBalances}/>*/}
+            <Container
+              {...metaMaskContext}
+              containerInstance={containerInstance}
+              containerAddress={containerAddress}
+            ></Container>
             <Token
               {...metaMaskContext}
               JSON={tokenJson}
@@ -260,6 +265,7 @@ function App() {
               addresses={ADDRESSES}
               balances={tokenBalances}
             />
+            <div> </div>
             <Transaction
               {...metaMaskContext}
               token={tokenInstance}

@@ -58,7 +58,6 @@ export default function Transaction(props) {
         <thead>
           <tr>
             <th>
-              {' '}
               <Loader />
             </th>
             <th>
@@ -90,9 +89,8 @@ export default function Transaction(props) {
     <div className={styles.counter}>
       <h3> 合规交易 </h3>
       <Box p={4}>
-        <Box>
-          <Form onSubmit={handleSubmit} validated={formValidated}>
-            {/* <Flex mx={-3} flexWrap={'wrap'}>
+        <Form onSubmit={handleSubmit} validated={formValidated}>
+          {/* <Flex mx={-3} flexWrap={'wrap'}>
               <Box width={[1, 1, 1]} px={3}>
                 <Field label="Sender Address" validated={validated} width={400}>
                   <Input
@@ -105,42 +103,41 @@ export default function Transaction(props) {
                 </Field>
               </Box>
             </Flex> */}
-            <Flex mx={-3} flexWrap={'wrap'}>
-              <Box width={[1, 1, 1]} px={3}>
-                <Field label="Recipient Address" validated={validated} width={400}>
-                  <Input
-                    type="text"
-                    required // set required attribute to use brower's HTML5 input validation
-                    onChange={handleRecipeint}
-                    value={recipient}
-                    width={1}
-                  />
-                </Field>
-              </Box>
-            </Flex>
-            <Flex mx={-3} flexWrap={'wrap'}>
-              <Box width={[1, 1, 1]} px={3}>
-                <Field label="Amount" validated={validated} width={200}>
-                  <Input
-                    type="text"
-                    required // set required attribute to use brower's HTML5 input validation
-                    onChange={handleAmount}
-                    value={amount}
-                    width={1}
-                  />
-                </Field>
-              </Box>
-            </Flex>
-            <Box>
-              {/* Use the validated state to update UI */}
-              <Button type="submit" disabled={!validated}>
-                Submit Form
-              </Button>
+          <Flex mx={-3} flexWrap={'wrap'}>
+            <Box width={[1, 1, 1]} px={3}>
+              <Field label="Recipient Address" validated={validated} width={400}>
+                <Input
+                  type="text"
+                  required // set required attribute to use brower's HTML5 input validation
+                  onChange={handleRecipeint}
+                  value={recipient}
+                  width={1}
+                />
+              </Field>
             </Box>
-            {sending && txHash && renderPendingTransactionHash()}
-            {!sending && txHash && renderMinedTransactionHash()}
-          </Form>
-        </Box>
+          </Flex>
+          <Flex mx={-3} flexWrap={'wrap'}>
+            <Box width={[1, 1, 1]} px={3}>
+              <Field label="Amount" validated={validated} width={400}>
+                <Input
+                  type="text"
+                  required // set required attribute to use brower's HTML5 input validation
+                  onChange={handleAmount}
+                  value={amount}
+                  width={1}
+                />
+              </Field>
+            </Box>
+          </Flex>
+          <Box>
+            {/* Use the validated state to update UI */}
+            <Button type="submit" disabled={!validated}>
+              Submit Form
+            </Button>
+          </Box>
+          {sending && txHash && renderPendingTransactionHash()}
+          {!sending && txHash && renderMinedTransactionHash()}
+        </Form>
       </Box>
     </div>
   );

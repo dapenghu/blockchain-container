@@ -13,10 +13,6 @@ export default function Token(props) {
     return `https://${networkName}.etherscan.io/tokens?q=${address}`;
   });
 
-  // state: recipient fund
-  const [, setIsDeployed] = useState(false);
-  const [funds, setFunds] = useState(0);
-
   const registerToken = useCallback(() => {
     web3.currentProvider.sendAsync(
       {
@@ -44,7 +40,7 @@ export default function Token(props) {
 
   return (
     <div className={styles.counter}>
-      <h2> DCEP Contract </h2>
+      <h2> DCEP 智能合约 </h2>
       <h5>
         <center>
           <a target="_blank" href={getTransactionLink(networkName, tokenAddress)}>
@@ -60,7 +56,7 @@ export default function Token(props) {
         {/**<caption>Token Balance Sheet</caption>*/}
         <thead>
           <tr>
-            <th>Account Address</th>
+            <th>Addresses of Members</th>
             <th>Account Balance</th>
           </tr>
         </thead>
