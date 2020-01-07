@@ -1,26 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button } from 'rimble-ui';
+import { Button, Link } from 'rimble-ui';
 
 import styles from './Token.module.scss';
 
-// import getTransactionReceipt from '../../utils/getTransactionReceipt';
-import { utils } from '@openzeppelin/gsn-provider';
-const { isRelayHubDeployedForRecipient, getRecipientFunds } = utils;
-
 export default function Token(props) {
   // const { accounts, networkId, networkName, providerName, lib, connected } = web3Context
-  const { instance, lib: web3, providerName, tokenAddress, addresses, balances } = props;
+  const { instance, lib: web3, networkName, tokenAddress, addresses, balances } = props;
   const { _address } = instance || {};
 
-  // state: address book of the wallet
-  // const addresses = useMemo(() => {
-  //   return wallet.map(item => item.address);
-  //   console.log(addresses);
-  // }, [wallet]);
-
-  // GSN provider has only one key pair
-  const isGSN = providerName === 'GSN';
-  // const totalSupply = 10000;
+  const getTransactionLink = useCallback((networkName, address) => {
+    // return  'https://' + networkName + '.etherscan.io/tx/' + txHash;
+    return `https://${networkName}.etherscan.io/tokens?q=${address}`;
+  });
 
   // state: recipient fund
   const [, setIsDeployed] = useState(false);
@@ -54,7 +45,13 @@ export default function Token(props) {
   return (
     <div className={styles.counter}>
       <h2> DCEP Contract </h2>
-      <h5 text-align="center"> {_address} </h5>
+      <h5>
+        <center>
+          <a target="_blank" href={getTransactionLink(networkName, tokenAddress)}>
+            {tokenAddress}
+          </a>{' '}
+        </center>
+      </h5>
       <h5>
         {' '}
         <Button onClick={() => registerToken()}>Register DCEP to MetaMask</Button>
