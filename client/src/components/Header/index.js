@@ -46,7 +46,7 @@ export default function Header(props) {
               <tr>
                 <th>
                   <MetaMaskButton.Outline width="300px" onClick={() => requestAuth(context)}>
-                    Disconnected with Network
+                    Sign in MetaMask
                   </MetaMaskButton.Outline>
                 </th>
               </tr>
