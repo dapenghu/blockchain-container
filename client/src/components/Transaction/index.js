@@ -53,35 +53,39 @@ export default function Transaction(props) {
 
   function renderPendingTransactionHash() {
     var txUrl = 'https://' + networkName + '.etherscan.io/tx/' + txHash;
-    console.log(txUrl);
-
     return (
-      <div>
-        <p>
-          <Loader /> Pending Transaction{' '}
-          <a target="_blank" rel="noopener noreferrer" href={txUrl}>
-            <small>{txHash.substr(0, 20)}</small>
-          </a>
-        </p>
-      </div>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>
+              {' '}
+              <Loader />
+            </th>
+            <th>
+              Pending Transaction{' '}
+              <a target="_blank" rel="noopener noreferrer" href={txUrl}>
+                <small>{txHash.substr(0, 20)}</small>
+              </a>
+            </th>
+          </tr>
+        </thead>
+      </table>
     );
   }
 
   function renderMinedTransactionHash() {
     var txUrl = 'https://' + networkName + '.etherscan.io/tx/' + txHash;
-    console.log(txUrl);
 
     return (
       <div>
-        <p>
-          <a target="_blank" rel="noopener noreferrer" href={txUrl}>
-            <small>{txHash.substr(0, 20)}</small>
-          </a>{' '}
-          has been mined on {networkName} network.
-        </p>
+        <a target="_blank" rel="noopener noreferrer" href={txUrl}>
+          <small>{txHash.substr(0, 20)}</small>
+        </a>{' '}
+        has been confirmed.
       </div>
     );
   }
+
   return (
     <div className={styles.counter}>
       <h3> 合规交易 </h3>
